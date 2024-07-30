@@ -15,12 +15,12 @@
         }"
         @change="onSchemaChange"
       />
-
       <p v-if="schemaError" class="is-warning mt-10">
         <span class="warning"><i class="fa fa-warning"></i></span>
         The format is not correct
       </p>
     </div>
+
     <div class="model-input">
       <h5 class="mb-15">Model</h5>
       <monaco-editor
@@ -36,11 +36,25 @@
         }"
         @change="onModelChange"
       />
-
       <p v-if="modelError" class="is-warning mt-10">
         <span class="warning"><i class="fa fa-warning"></i></span>
         The format is not correct
       </p>
+    </div>
+
+    <div v-if="parsedSchema" class="form-fields mt-30">
+      <h5 class="mb-15">Form</h5>
+      <div v-for="(property, name) in parsedSchema.properties" :key="name" class="form-field">
+        <label :for="name">{{ name }}</label>
+        <div v-if="property.enum">
+          <select v-model="formData[name]">
+            <option v-for="option in property.enum" :key="option" :value="option">{{ option }}</option>
+          </select>
+        </div>
+        <div v-else>
+          <input type="text" v-model="formData[name]" :id="name" />
+        </div>
+      </div>
     </div>
 
     <div class="buttons mt-20">
@@ -76,7 +90,7 @@ export default defineComponent({
     return {
       schema: '',
       model: '',
-
+      formData: {},
       schemaError: false,
       modelError: false,
     };
@@ -87,6 +101,20 @@ export default defineComponent({
       return document.documentElement.classList.contains('is-dark-theme')
         ? 'vs-dark'
         : 'vs';
+    },
+    parsedSchema() {
+      try {
+        return JSON.parse(this.schema);
+      } catch {
+        return null;
+      }
+    },
+    parsedModel() {
+      try {
+        return JSON.parse(this.model);
+      } catch {
+        return null;
+      }
     },
   },
 
@@ -114,6 +142,7 @@ export default defineComponent({
     initSchemaModel() {
       this.schema = JSON.stringify(this.schemaModel.schema, null, 2);
       this.model = JSON.stringify(this.schemaModel.model, null, 2);
+      this.formData = { ...this.schemaModel.model };
     },
 
     updateForm() {
@@ -148,3 +177,42 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.schema-model-wrapper {
+  padding: 20px;
+}
+
+.editor-writable {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.is-warning {
+  color: #ffcc00;
+}
+
+.form-fields {
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+
+.form-field {
+  margin-bottom: 15px;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-field select,
+.form-field input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+</style>
