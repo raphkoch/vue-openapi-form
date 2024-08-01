@@ -10,19 +10,9 @@
           :rules="ruleObject(true)"
           as=""
         >
-          <object-form-wrapper
-            field-name="$"
-            :model-value="field.value"
-            :expand-form="true"
-            :is-root="true"
-            :level="1"
-            :is-self-required="true"
-            :only-json="onlyJson"
-            :schema="extendedSchema"
-            :reference-model="referenceModel || {}"
-            :errors="errors"
-            :showRootTab="true"
-            @update:modelValue="handleChange"
+          <schema-model
+            :schema-model="{ schema: extendedSchema, model: modelValue }"
+            @submit="handleFormSubmit"
           />
         </v-field>
       </div>
@@ -55,6 +45,7 @@ import ExtendSchema from '../functional-components/extend-schema.js';
 import validation from '../mixins/validation.js';
 import { model } from '../mixins/model.js';
 import { defineAsyncComponent, defineComponent } from 'vue';
+import SchemaModel from './SchemaModel.vue';
 
 export default defineComponent({
   name: 'VueOpenapiForm',
@@ -67,6 +58,7 @@ export default defineComponent({
         '@appscode/design-system/vue-components/v3/form/FormFooterControl.vue'
       )
     ),
+    SchemaModel
   },
   mixins: [model, validation],
   provide() {
@@ -113,6 +105,12 @@ export default defineComponent({
       return ExtendSchema(this.schema, this.formTitle);
     },
   },
+  methods: {
+    handleFormSubmit(updatedSchemaModel) {
+      this.$emit('update:modelValue', updatedSchemaModel.model);
+      // Additional handling if needed
+    }
+  }
 });
 </script>
 
