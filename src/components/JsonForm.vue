@@ -7,15 +7,19 @@
       language="json"
       :editor-height="70"
     />
+    <div>
+      <button @click="handleSubmit">Submit</button>
+    </div>
   </div>
 </template>
 
 <script>
 import { model } from '../mixins/model.js';
 import { defineAsyncComponent, defineComponent } from 'vue';
+import axios from 'axios'; 
 
 export default defineComponent({
-  name: 'YamlForm',
+  name: 'JsonForm',
 
   components: {
     Editor: defineAsyncComponent(() =>
@@ -27,7 +31,7 @@ export default defineComponent({
   inject: ['providedData'],
   props: {
     modelValue: {
-      type: null,
+      type: Object,
       default: () => ({}),
     },
   },
@@ -58,5 +62,17 @@ export default defineComponent({
       },
     },
   },
+
+  methods: {
+    async handleSubmit() {
+      try {
+        const response = await axios.post('', this.modelValue);
+        console.log('Form submitted successfully:', response.data);
+        this.$emit('submit', this.modelValue); 
+      } catch (error) {
+        console.error('Error submitting form:', error);
+      }
+    }
+  }
 });
 </script>

@@ -34,6 +34,16 @@
             :form-status="meta"
             :errors="errors"
           />
+          <!-- Pass modelValue to the Done button component -->
+          <Button
+            class="button ac-button is-primary"
+            :modelValue="modelValue"
+            data-testid="ac-create-button"
+            title="Done"
+          >
+            <span class="icon is-small"><i class="fa fa-check" aria-hidden="true"></i></span>
+            <span>Done</span>
+          </Button>
         </form-footer-control>
       </template>
     </ac-form>
@@ -46,7 +56,7 @@ import validation from '../mixins/validation.js';
 import { model } from '../mixins/model.js';
 import { defineAsyncComponent, defineComponent } from 'vue';
 import SchemaModel from './SchemaModel.vue';
-
+import axios from 'axios'; 
 export default defineComponent({
   name: 'VueOpenapiForm',
   components: {
@@ -58,8 +68,12 @@ export default defineComponent({
         '@appscode/design-system/vue-components/v3/form/FormFooterControl.vue'
       )
     ),
-    SchemaModel
+    SchemaModel,
+    Button: defineAsyncComponent(() =>
+      import('@appscode/design-system/vue-components/v3/button/Button.vue')
+    )
   },
+  
   mixins: [model, validation],
   provide() {
     const providedData = {};
@@ -109,6 +123,14 @@ export default defineComponent({
     handleFormSubmit(updatedSchemaModel) {
       this.$emit('update:modelValue', updatedSchemaModel.model);
       // Additional handling if needed
+    },
+    async handleSubmit() {
+      try {
+        const response = await axios.post('', this.modelValue);
+        console.log('Form submitted successfully:', response.data);
+      } catch (error) {
+        console.error('Error submitting form:', error);
+      }
     }
   }
 });
