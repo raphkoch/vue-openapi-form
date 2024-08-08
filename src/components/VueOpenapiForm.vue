@@ -38,6 +38,7 @@
           <Button
             class="button ac-button is-primary"
             :modelValue="modelValue"
+            :disabled="false"
             data-testid="ac-create-button"
             title="Done"
           >
@@ -56,7 +57,7 @@ import validation from '../mixins/validation.js';
 import { model } from '../mixins/model.js';
 import { defineAsyncComponent, defineComponent } from 'vue';
 import SchemaModel from './SchemaModel.vue';
-import axios from 'axios'; 
+
 export default defineComponent({
   name: 'VueOpenapiForm',
   components: {
@@ -64,14 +65,12 @@ export default defineComponent({
       import('@appscode/design-system/vue-components/v3/form/Form.vue')
     ),
     FormFooterControl: defineAsyncComponent(() =>
-      import(
-        '@appscode/design-system/vue-components/v3/form/FormFooterControl.vue'
-      )
+      import('@appscode/design-system/vue-components/v3/form/FormFooterControl.vue')
     ),
-    SchemaModel,
     Button: defineAsyncComponent(() =>
-      import('@appscode/design-system/vue-components/v3/button/Button.vue')
-    )
+      import('@appscode/design-system/vue-components/v3/button/Button.vue') 
+    ),
+    SchemaModel
   },
   
   mixins: [model, validation],
@@ -120,21 +119,23 @@ export default defineComponent({
     },
   },
   methods: {
-    handleFormSubmit(updatedSchemaModel) {
-      this.$emit('update:modelValue', updatedSchemaModel.model);
-      // Additional handling if needed
-    },
-    async handleSubmit() {
+    async handleFormSubmit() {
+      
+      this.$emit('update:modelValue', this.modelValue);
+     
+      console.log('modelValue:', this.modelValue);
+      // form submission logic
       try {
-        const response = await axios.post('', this.modelValue);
-        console.log('Form submitted successfully:', response.data);
+        const response = await axios.post('http://localhost:3003/v1/measurement', this.modelValue);
+        console.log('Job submitted successfully:', response.data);
       } catch (error) {
-        console.error('Error submitting form:', error);
+        console.error('Error submitting job:', error);
       }
     }
   }
 });
 </script>
+
 
 <style lang="scss">
 @import 'font-awesome/css/font-awesome.min.css';
