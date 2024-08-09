@@ -15,7 +15,7 @@
             @submit="handleFormSubmit"
           />
         </v-field>
-      </div>
+  </div>
       <template #form-left-controls>
         <form-footer-control>
           <slot
@@ -72,7 +72,7 @@ export default defineComponent({
     ),
     SchemaModel
   },
-  
+
   mixins: [model, validation],
   provide() {
     const providedData = {};

@@ -6,8 +6,8 @@
         <nav class="ac-navbar">
           <!-- navbar logo start  -->
           <div class="ac-navbar-brand">
-            <a href="https://byte.builders/"
-              ><img
+            <a href="https://byte.builders/">
+              <img
                 src="https://cdn.appscode.com/images/products/bytebuilders/bytebuilders.png"
               />
             </a>
@@ -77,6 +77,7 @@
             :reference-model="referenceModel || ''"
             :form-title="formTitle"
           >
+            <!-- Left Controls -->
             <template #left-controls>
               <ac-button
                 title="Cancel"
@@ -84,16 +85,27 @@
                 @click.prevent="cancelFunc"
               />
             </template>
+            
+            <!-- Right Controls -->
             <template #right-controls="{ validate }">
-              <ac-button
-                title="Done"
-                :is-loader-active="isLoading"
-                icon-class="check"
-                @click.prevent="submitFunc(validate)"
-              />
-            </template>
-          </vue-openapi-form>
-        </div>
+                  <div class="form-footer-control">
+                    <ac-button
+                      title="Done"
+                      :is-loader-active="isLoading"
+                      icon-class="check"
+                      @click.prevent="submitFunc(validate)"
+                    />
+                    <ac-button
+                      title="Submit"
+                      class="ml-10"
+                      :is-loader-active="isLoading"
+                      icon-class="send"
+                      @click.prevent="submitData(validate)"
+                    />
+                  </div>
+                </template>
+              </vue-openapi-form>
+            </div>
 
         <ac-button
           title="Call Validate"
@@ -107,9 +119,11 @@
   </div>
 </template>
 
+
 <script>
 import Schemas from '@/json-schema.js';
 import { defineAsyncComponent, defineComponent } from 'vue';
+import axios from 'axios';
 
 export default defineComponent({
   name: 'App',
@@ -175,6 +189,24 @@ export default defineComponent({
       }
       this.isLoading = false;
     },
+    async submitData(validate) {
+      this.isLoading = true;
+      const { valid } = await validate();
+      if (valid) {
+        try {
+          const response = await axios.post(
+            'http://localhost:3003/v1/measurement',
+            this.model
+          );
+          console.log('Form submitted successfully:', response.data);
+        } catch (error) {
+          console.error('Error submitting form:', error);
+        }
+      } else {
+        console.log('form is invalid');
+      }
+      this.isLoading = false;
+    },
     async callValidate() {
       const { valid } = await this.$refs.vof.$refs['v-form'].validate();
       console.log(valid);
@@ -185,7 +217,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .ac-navbar-area {
-
   &.is-full {
     margin-left: 0;
 
@@ -202,7 +233,6 @@ export default defineComponent({
   .ac-navbar {
     display: inline-grid;
     grid-template-columns: auto auto;
-    // margin-left: 255px;
     grid-gap: 20px;
     align-items: center;
     width: 100%;
@@ -245,5 +275,4 @@ export default defineComponent({
     }
   }
 }
-
 </style>
