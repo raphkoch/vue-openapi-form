@@ -45,6 +45,13 @@
             <span class="icon is-small"><i class="fa fa-check" aria-hidden="true"></i></span>
             <span>Done</span>
           </Button>
+          <Button
+            title="Submit"
+            class="button ac-button is-primary"
+            :is-loader-active="isLoading"
+            icon-class="send"
+            @click.prevent="handleFormSubmit(validate)"
+          />
         </form-footer-control>
       </template>
     </ac-form>
